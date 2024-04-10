@@ -60,16 +60,10 @@ body {
     border-color: rgba(255, 255, 255, 0); /* Maintain invisible border */
 }
 body {
-    background-color: #376618; /* Tailwind CSS-like dark background */
-    color: white; /* Ensure text is visible */
-}
-.color-strip {
-    height: 750px;
     background-image: url('../images/fotbal.png'); /* Updated relative path */
     background-size: cover;
     background-position: center;
 }
-
 .title-button {
     display: inline-block;
     background-color: transparent; /* Adjust as needed */
@@ -82,22 +76,27 @@ body {
 }
 .games-list {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
+    flex-direction: column;
+    gap: 20px; /* Adjust the gap between cards as needed */
+}
+.game-card {
+    background-color: rgba(255, 255, 255, 0.4); /* 60% transparent white */
+    color: #000000; /* Change text color for better visibility */
+    padding: 20px;
+    border: 4px solid #000000; /* Thick black outline */
+    border-radius: 50px; /* Optional: for rounded corners */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Optional: for a subtle shadow */
+    width: 70%; /* Set the width to 80% */
+    margin: 0 auto; /* Center the element horizontally */
 }
 
-.game-card {
-    background: #fff;
-    color: #333;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    overflow: hidden;
-    width: 300px;
+.game-card:hover {
+    transform: scale(1.05); /* Slightly enlarge the card */
+    background-color: rgba(255, 255, 255, 0.6); /* Increase transparency on hover */
 }
 
 .game-date {
-    background: #007BFF;
+    background: #548f2d;
     color: #ffffff;
     padding: 10px;
     text-align: center;
@@ -113,14 +112,51 @@ body {
 .team {
     display: flex;
     align-items: center;
+    font-size: 24px;
 }
 
 .team-logo {
-    width: 40px;
-    height: 40px;
+    width: 70px;
+    height: 70px;
     margin-right: 10px;
 }
 
 .vs {
     font-weight: bold;
+    font-size: 24px; /* Adjust the font size as needed */
+    align-items: center;
 }
+
+input[type="date"] {
+    background-color: #f2f2f2;
+    border: 1px solid #ccc;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+input[type="date"]:hover {
+    border-color: #888;
+}
+
+/* Style the Apply Filters button */
+button#apply-filters {
+    background-color: #4CAF50; /* Green background */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button#apply-filters:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
+
+/* You can also add styles for focus to improve accessibility */
+button#apply-filters:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(76,175,80, 0.5); /* Adds a focus outline */
+}
+
