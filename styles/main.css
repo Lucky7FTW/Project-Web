@@ -21,7 +21,7 @@ body {
     text-align: center;
     transition: all 0.2s;
   }
-  body {
+body {
     margin: 0;
     padding: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -29,6 +29,7 @@ body {
     color: #FFFFFF;
     min-height: 100%;
     background-attachment: fixed;
+    background-size: cover;
 }
 .header {
     background-color: #548f2d; /* Change to your preferred color */
@@ -79,4 +80,47 @@ body {
     font-size: 35px; /* Adjust font size as needed */
     font-weight: bold;
 }
+.games-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
 
+.game-card {
+    background: #fff;
+    color: #333;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    overflow: hidden;
+    width: 300px;
+}
+
+.game-date {
+    background: #007BFF;
+    color: #ffffff;
+    padding: 10px;
+    text-align: center;
+}
+
+.teams {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 20px;
+}
+
+.team {
+    display: flex;
+    align-items: center;
+}
+
+.team-logo {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+
+.vs {
+    font-weight: bold;
+}
