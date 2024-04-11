@@ -36,29 +36,10 @@
             background-color: #ddd;
             color: black;
         }
-        .container {
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+        .tab-content { 
+            display: none; /* Ensures tab contents are hidden by default */
         }
-        .game-list {
-            list-style: none;
-            padding: 0;
-        }
-        .game-list li {
-            padding: 10px;
-            border-bottom: 1px solid #ddd; /* Light grey line */
-        }
-        .bet-button {
-            padding: 10px 20px;
-            background-color: #28a745; /* Green background */
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .bet-button:hover {
-            background-color: #155d34; /* Darker green */
-        }
+        /* Add any additional styles from your main.css here */
     </style>
     <link rel="stylesheet" href="styles/main.css">
 </head>
@@ -69,44 +50,101 @@
     
     <div class="nav-bar">
         <a href="/" class="bn3">Home</a>
-        <a href="javascript:void(0);" class="bn3 live-bets-link">Live Bets</a>
-        <a href="javascript:void(0);" class="bn3 upcoming-games-link">Upcoming Games</a>
-        <a href="/my-bets" class="bn3">My Bets</a>
-        <a href="javascript:void(0);" id="flashscore-link" class="bn3">Frashscore</a>
-
+        <a href="javascript:void(0);" class="bn3 live-games-link" data-target="live-games-section">Live Games</a>
+        <a href="javascript:void(0);" class="bn3 upcoming-games-link" data-target="upcoming-games-section">Upcoming Games</a>
+        <a href="javascript:void(0);" class="bn3" data-target="my-bets-section">My Bets</a>
+        <a href="javascript:void(0);" id="flashscore-link" class="bn3" data-target="freshscore-section">Freshscore</a>
+        <div class="right-buttons">
+        <a href="javascript:void(0);" id="login-link" class="bn3">Login</a>
+        <a href="javascript:void(0);" id="signin-link" class="bn3">Sign Up</a>
+        <a href="javascript:void(0);" id="profile-link" class="bn3" style="display:none;">My Profile</a>
+        </div>
     </div>
-
-    <div id="flashscore-widget-container" style="display: none;">
-        <div id="wg-api-football-fixtures"
-             data-host="v3.football.api-sports.io"
-             data-refresh="60"
-             data-date="2024-04-10"
-             data-key="ed4be25206a6d2113559eb2049ffbfad" 
-             data-theme=""
-             data-show-errors="false"
-             class="api_football_loader">
+    
+    <div id="live-games-section" class="tab-content">
+        <div id="live-games" class="live-games-container">
+            <!-- Live odds will be displayed here -->
         </div>
     </div>
 
-    <div id="filters-container" style="text-align: center; padding: 20px; display: none;">
-        <input type="date" id="game-date-picker" placeholder="Select date">
-        <button id="apply-filters">Apply Filters</button>
+    <div id="upcoming-games-section" class="tab-content">
+        <h2>
+            <div id="filters-container" style="text-align: center; padding: 20px; display: none;">
+            <input type="date" id="game-date-picker" placeholder="Select date">
+            <button id="apply-filters">Apply Filters</button>
+        </h2>
+            <div id="upcoming-games" class="upcoming-games-container"></div>
+        </div>
     </div>
 
-    <div id="live-games" class="live-games-container">
-        <!-- Live odds will be displayed here -->
+    <div id="my-bets-section" class="tab-content">
+        <!-- Content for My Bets goes here -->
     </div>
 
-    <div id="live-games" class="live-games-container">
-        <!-- Live odds will be displayed here -->
+
+    <div id="freshscore-section" class="tab-content">
+        <div id="flashscore-widget-container" style="display: none;">
+            <div id="wg-api-football-fixtures"
+                 data-host="v3.football.api-sports.io"
+                 data-refresh="60"
+                 data-date=""
+                 data-key="ed4be25206a6d2113559eb2049ffbfad" 
+                 data-theme=""
+                 data-show-errors="false"
+                 class="api_football_loader">
+            </div>
+        </div>
     </div>
-    <script type="module" src="https://widgets.api-sports.io/football/1.1.8/widget.js"></script>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <h2>Login</h2>
+        <form id="login-form">
+            <label for="username">Username:</label><br>
+            <input type="text" id="username" name="username"><br>
+            <label for="password">Password:</label><br>
+            <input type="password" id="password" name="password"><br><br>
+            <input type="submit" value="Submit">
+        </form>
+        </div>
+    </div>
+
+    <!-- Sign Up Modal -->
+    <div id="signup-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Sign Up</h2>
+            <form id="signup-form">
+                <label for="email">Email:</label><br>
+                <input type="email" id="signup-email" name="email" required><br>
+                <label for="username">Username:</label><br>
+                <input type="text" id="signup-username" name="username" required><br>
+                <label for="password">Password:</label><br>
+                <input type="password" id="signup-password" name="password" required><br><br>
+                <input type="submit" value="Submit">
+            </form>
+        </div>
+    </div>
 
     <script src="scripts/app.js"></script>
+    <script src="scripts/odds.js"></script>
+    <script src="scripts/games.js"></script>
+
+    <script type="module" src="https://widgets.api-sports.io/football/1.1.8/widget.js"></script>
+
     <div class="color-strip"></div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            
+        const today = new Date().toISOString().split('T')[0];
+            
+        const widgetContainer = document.getElementById('wg-api-football-fixtures');
+        if (widgetContainer) {
+        widgetContainer.setAttribute('data-date', today);
+            }   
             document.getElementById('flashscore-link').addEventListener('click', function() {
                 var widgetContainer = document.getElementById('flashscore-widget-container');
                 var isVisible = widgetContainer.style.display === 'block';
@@ -130,6 +168,5 @@
             });
         });
         </script>
-        
 </body>
 </html>

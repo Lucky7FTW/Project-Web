@@ -25,8 +25,8 @@ body {
     margin: 0;
     padding: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #333; /* Set your desired color here */
-    color: #FFFFFF;
+    background-color: #f8f8f8; /* Off-white background for contrast with green */
+    color: #333333; /* Dark grey for text for readability */
     min-height: 100%;
     background-attachment: fixed;
     background-size: cover;
@@ -55,7 +55,7 @@ body {
 }
 
 .nav-bar a:hover, .nav-bar a:active {
-    background-color: #555; /* Lighter grey */
+    background-color: #708238; /* Olive green for hover states */
     color: #ffffff;
     border-color: rgba(255, 255, 255, 0); /* Maintain invisible border */
 }
@@ -83,7 +83,7 @@ body {
     background-color: rgba(255, 255, 255, 0.4); /* 60% transparent white */
     color: #000000; /* Change text color for better visibility */
     padding: 20px;
-    border: 4px solid #000000; /* Thick black outline */
+    border: 4px solid #333; /* Thick black outline */
     border-radius: 50px; /* Optional: for rounded corners */
     box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Optional: for a subtle shadow */
     width: 70%; /* Set the width to 80% */
@@ -141,7 +141,7 @@ input[type="date"]:hover {
 
 /* Style the Apply Filters button */
 button#apply-filters {
-    background-color: #4CAF50; /* Green background */
+    background-color: #548f2d; /* Green background */
     color: white;
     padding: 10px 20px;
     border: none;
@@ -160,3 +160,99 @@ button#apply-filters:focus {
     box-shadow: 0 0 0 2px rgba(76,175,80, 0.5); /* Adds a focus outline */
 }
 
+.team-name, .score {
+    margin-right: 100px; /* Adds space to the right of the team name and score */
+}
+
+/* Adjusting for the away team to add space before the score since it comes before the name */
+.away-team .score {
+    margin-right: 100px;
+    margin-left: 10px; /* Adds space to the left of the score for the away team */
+}
+
+.score {
+    color: #ffffff; /* White color for the score */
+    background-color: #444; /* Darker background for the score element */
+    padding: 5px 10px; /* Add some padding around the score */
+    border-radius: 5px; /* Optional: adds rounded corners for a pill-like effect */
+    margin: 0 5px; /* Ensures spacing around the score for separation */
+}
+
+.team-name {
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Adjust shadow color and spread to fit your design */
+    font-family: 'Roboto', sans-serif; /* This is just an example; choose what fits your design */
+    font-size: 20px; /* Increase the font size for better readability */
+    font-weight: 600; /* A bolder font weight makes text stand out */
+}
+
+@media (max-width: 768px) {
+    .team-name, .score, .vs {
+        font-size: calc(14px + 1vw); /* Smaller base size for smaller screens */
+    }
+
+    .teams {
+        flex-direction: column; /* Stacks team information vertically on small screens */
+    }
+}
+
+#timeline-section h3 {
+    margin-bottom: 10px;
+}
+
+.timeline-event .event-details {
+    background-color: #f9f9f9; /* Light background for each event */
+    border-radius: 5px;
+    padding: 5px 10px;
+    display: inline-block;
+}
+
+.event-time, .team-name, .event-name {
+    font-weight: bold;
+}
+
+.team-name {
+    margin-right: 10px;
+}
+
+.right-buttons {
+    float: right;
+}
+
+
+/* The Modal (background) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+  }
+  
+  /* Modal Content/Box */
+  .modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; /* 15% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* Could be more or less, depending on screen size */
+  }
+  
+  /* The Close Button */
+  .close-button {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+  }
+  
+  .close-button:hover,
+  .close-button:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+  }
