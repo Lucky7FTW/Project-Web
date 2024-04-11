@@ -45,11 +45,11 @@
 </head>
 <body>
     <div class="header">
-        <a href="/" class="title-button">BEBANO</a>
+        <a href="javascript:void(0);" class="title-button">BEBANO</a>
     </div>
     
     <div class="nav-bar">
-        <a href="/" class="bn3">Home</a>
+        <a href="javascript:void(0);" class="bn3">Home</a>
         <a href="javascript:void(0);" class="bn3 live-games-link" data-target="live-games-section">Live Games</a>
         <a href="javascript:void(0);" class="bn3 upcoming-games-link" data-target="upcoming-games-section">Upcoming Games</a>
         <a href="javascript:void(0);" class="bn3" data-target="my-bets-section">My Bets</a>
@@ -99,15 +99,15 @@
     <!-- Login Modal -->
     <div id="login-modal" class="modal" style="display:none;">
         <div class="modal-content">
-        <span class="close-button">&times;</span>
-        <h2>Login</h2>
-        <form id="login-form">
-            <label for="username">Username:</label><br>
-            <input type="text" id="username" name="username"><br>
-            <label for="password">Password:</label><br>
-            <input type="password" id="password" name="password"><br><br>
-            <input type="submit" value="Submit">
-        </form>
+            <span class="close-button">&times;</span>
+            <h2>Login</h2>
+            <form id="login-form">
+                <label for="login-email">Email:</label><br>
+                <input type="email" id="login-email" name="email" required><br>
+                <label for="login-password">Password:</label><br>
+                <input type="password" id="login-password" name="password" required><br><br>
+                <input type="submit" value="Login">
+            </form>
         </div>
     </div>
 
@@ -123,16 +123,69 @@
                 <input type="text" id="signup-username" name="username" required><br>
                 <label for="password">Password:</label><br>
                 <input type="password" id="signup-password" name="password" required><br><br>
-                <input type="submit" value="Submit">
+                <input type="submit" id="signup-submit" value="Submit">
             </form>
         </div>
     </div>
 
-    <script src="scripts/app.js"></script>
+
+
+    <!-- Profile Section -->
+<div id="profile-section" class="profile-content" style="display:none;">
+    <div class="profile-container">
+        <h2>My Profile</h2>
+        <form id="profile-form">
+            <span id="close-profile" style="cursor:pointer;position:absolute;top:0;right:10px;font-size:24px;">X</span>
+            <div class="form-group">
+                <label for="profile-email">Email:</label>
+                <input type="email" id="profile-email" name="email" required readonly>
+            </div>
+            <div class="form-group">
+                <label for="profile-username">Username:</label>
+                <input type="text" id="profile-username" name="username" required readonly>
+            </div>
+            <button id="logout-button" style="padding:10px; margin-top:10px;">Logout</button>
+        </form>
+    </div>
+</div>
+
+
     <script src="scripts/odds.js"></script>
     <script src="scripts/games.js"></script>
-
     <script type="module" src="https://widgets.api-sports.io/football/1.1.8/widget.js"></script>
+
+
+    <script type="module">
+        import { registerNewUser } from './scripts/firebase.js'; // Make sure the path is correct
+      
+        document.getElementById('signup-form').addEventListener('submit', function(event) {
+          event.preventDefault();
+          const email = document.getElementById('signup-email').value;
+          const password = document.getElementById('signup-password').value;
+      
+          registerNewUser(email, password)
+            .then(user => {
+              console.log("Signup successful, user info:", user);
+              // Handle successful signup, like redirecting or updating UI
+            })
+            .catch(error => {
+              console.error("Signup failed:", error.message);
+              // Handle errors, like showing a message to the user
+            });
+        });
+    </script>
+
+    <script>
+    document.getElementById('signin-link').addEventListener('click', function() {
+        var modal = document.getElementById('signup-modal');
+        modal.style.display = 'block';
+    });
+    
+    document.querySelector('.close-button').addEventListener('click', function() {
+        var modal = document.getElementById('signup-modal');
+        modal.style.display = 'none';
+    });
+    </script>
 
     <div class="color-strip"></div>
 

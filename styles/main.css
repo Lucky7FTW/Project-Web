@@ -256,3 +256,60 @@ button#apply-filters:focus {
     text-decoration: none;
     cursor: pointer;
   }
+
+  .profile-content {
+    display: none; /* Hidden by default, toggled by JavaScript */
+    position: fixed; /* Make it float above other content */
+    top: 50%; /* Center vertically */
+    left: 50%; /* Center horizontally */
+    transform: translate(-50%, -50%); /* Align center */
+    width: 80%; /* Responsive width */
+    max-width: 500px; /* Max width for larger screens */
+    padding: 20px;
+    background-color: #ffffff; /* Bright background */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Subtle shadow */
+    z-index: 1000; /* Ensure it's on top of other content */
+}
+
+.profile-container {
+    margin: 0 auto; /* Centering form */
+    width: 90%; /* Responsive width */
+}
+
+.form-group {
+    margin-bottom: 20px; /* Space between form elements */
+}
+
+.profile-container h2 {
+    text-align: center;
+    color: #333; /* Dark text for visibility */
+}
+
+.profile-container label {
+    display: block;
+    color: #666; /* Grey text */
+}
+
+.profile-container input {
+    width: 100%; /* Full width */
+    padding: 8px;
+    margin-top: 5px; /* Space between label and input */
+    border: 1px solid #ddd; /* Light grey border */
+    border-radius: 4px; /* Rounded borders for inputs */
+}
+
+.save-btn {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color: #4CAF50; /* Green background */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.save-btn:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
