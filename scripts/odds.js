@@ -1,3 +1,5 @@
+import { storeBetDetails, getCurrentUserBalance, updateUserBalance } from './firebase.js';
+
 // odds.js
 document.addEventListener('DOMContentLoaded', function() {
     document.querySelector('.upcoming-games-link').addEventListener('click', function() {
@@ -104,13 +106,13 @@ async function fetchAndDisplayOdds(fixtureId) {
     try {
         const response = await fetch(url, options);
         const data = await response.json();
-        displayOdds(data); // Implement this function to display odds based on the fetched predictions
+        displayOdds(data,fixtureId); // Implement this function to display odds based on the fetched predictions
     } catch (error) {
         console.error('Error fetching odds:', error);
     }
 }
 
-function displayOdds(data) {
+function displayOdds(data,fixtureId) {
     // Check if a modal already exists and remove it
     const existingModal = document.getElementById('odds-modal');
     if (existingModal) {
@@ -148,16 +150,50 @@ function displayOdds(data) {
         oddsList.style.padding = '0';
 
         // Function to create list item for odds
-        const createOddsItem = (label, odds) => {
+        const createOddsItem = (label, odds,fixtureId) => {
             const item = document.createElement('li');
             item.style.padding = '10px';
             item.style.borderBottom = '1px solid #ddd';
             item.innerHTML = `<strong>${label}:</strong> <span style="cursor:pointer; text-decoration:underline; color:#007BFF;">${odds}</span>`;
+
+            item.innerHTML = `
+            <div><strong>${label}:</strong> ${odds}</div>
+            <input type="number" placeholder="Bet Amount" min="1" class="bet-amount" style="margin-right: 10px;">
+            <button class="place-bet">Place Bet</button>
+            `;
             
-            // Add click event listener for placing a bet
-            item.addEventListener('click', () => {
-                alert(`Placing a bet on: ${label} with odds of ${odds}`);
-                // Here you can implement further logic to handle the betting process
+            item.querySelector('.place-bet').addEventListener('click', async function() {
+                const betAmount = parseFloat(item.querySelector('.bet-amount').value);
+                if (!betAmount || betAmount <= 0) {
+                    alert('Please enter a valid bet amount.');
+                    return;
+                }
+                
+                try {
+                    const currentBalance = await getCurrentUserBalance();
+                    if (betAmount > currentBalance) {
+                        alert('Insufficient balance to place this bet.');
+                        return;
+                    }
+            
+                    const newBalance = currentBalance - betAmount;
+                    await updateUserBalance(newBalance); // Assuming this function is implemented in your firebase.js
+            
+                    // Optional: Store the bet details
+                    const betDetails = {
+                        amount: betAmount,
+                        fixtureId: fixtureId,
+                        label: label, // Assuming 'label' is defined in your scope
+                        odds: odds, // Assuming 'odds' is defined in your scope
+                        placedOn: new Date().toISOString()
+                    };
+                    await storeBetDetails(betDetails); // Assuming this function is implemented in your firebase.js
+            
+                    alert(`Bet of ${betAmount} placed on: ${label} with odds of ${odds}. New balance: ${newBalance}`);
+                } catch (error) {
+                    console.error('Error placing bet:', error);
+                    alert('Failed to place bet. Please try again.');
+                }
             });
 
             return item;
@@ -174,9 +210,9 @@ function displayOdds(data) {
         const awayWinOdds = awayWinPercentage ? (100 / awayWinPercentage).toFixed(2) : "N/A";
 
         // Append odds to the list
-        oddsList.appendChild(createOddsItem("Home Win Odds", homeWinOdds));
-        oddsList.appendChild(createOddsItem("Draw Odds", drawOdds));
-        oddsList.appendChild(createOddsItem("Away Win Odds", awayWinOdds));
+        oddsList.appendChild(createOddsItem("Home Win Odds", homeWinOdds,fixtureId));
+        oddsList.appendChild(createOddsItem("Draw Odds", drawOdds,fixtureId));
+        oddsList.appendChild(createOddsItem("Away Win Odds", awayWinOdds,fixtureId));
 
         modal.appendChild(oddsList);
 

@@ -2,7 +2,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js";
-import { getDatabase, ref, set,get } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-database.js";
+import { getDatabase, ref, set, get, push } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-database.js";
 
 // Firebase configuration from your Firebase project
 const firebaseConfig = {
@@ -186,11 +186,16 @@ document.getElementById('profile-link').addEventListener('click', function() {
 
 onAuthStateChanged(auth, (user) => {
     console.log("Auth state changed");
+    
     if (user) {
         console.log("User is signed in:", user.uid);
         const email = user.email;
         const userId = user.uid;
         const userRef = ref(database, 'users/' + userId);
+        
+        document.getElementById('login-link').style.display = 'none';  // Hide login button
+        document.getElementById('signin-link').style.display = 'none';  // Hide sign up button
+        document.getElementById('profile-link').style.display = 'block'; // Show profile button
 
         get(userRef).then((snapshot) => {
             if (snapshot.exists()) {
@@ -226,7 +231,7 @@ document.getElementById('close-profile').addEventListener('click', function() {
     }
 });
 document.getElementById('logout-button').addEventListener('click', function() {
-    firebase.auth().signOut().then(() => {
+    auth.signOut().then(() => {
         console.log('User logged out successfully.');
         // Redirect to home page or login page as needed
         window.location.href = '/'; // Adjust as necessary
@@ -265,4 +270,125 @@ document.getElementById('refresh-balance').addEventListener('click', function(ev
     fetchAndUpdateBalance(); // Call the function to update the balance
 });
 
-export { showModal, closeModal, registerNewUser };
+async function getCurrentUserBalance() {
+    const user = auth.currentUser;
+    if (user) {
+        const userId = user.uid;
+        try {
+            const userRef = ref(database, 'users/' + userId);
+            const snapshot = await get(userRef);
+            if (snapshot.exists() && snapshot.val().balance !== undefined) {
+                return snapshot.val().balance;
+            } else {
+                console.log("Balance not found, setting default to 0");
+                await set(ref(database, `users/${userId}/balance`), 0); // Optional: Initialize balance if not set
+                return 0; // Default balance if not set
+            }
+        } catch (error) {
+            console.error("Failed to fetch user balance:", error);
+            throw new Error("Failed to fetch balance");
+        }
+    } else {
+        console.log("No user signed in.");
+        return 0; // Return 0 or handle appropriately if no user is signed in
+    }
+}
+
+
+async function updateUserBalance(newBalance) {
+    const user = auth.currentUser;
+    if (user) {
+        const userId = user.uid;
+        try {
+            await set(ref(database, `users/${userId}/balance`), newBalance);
+            console.log("Balance updated successfully.");
+        } catch (error) {
+            console.error("Failed to update user balance:", error);
+            throw new Error("Failed to update balance");
+        }
+    } else {
+        console.log("No user signed in.");
+        // Handle appropriately if no user is signed in
+    }
+}
+
+async function storeBetDetails(betDetails) {
+    const user = auth.currentUser;
+    if (user) {
+        const userId = user.uid;
+        try {
+            // Assuming `bets` is a direct child of the root and you want to store bets under each user's UID
+            const betsRef = ref(database, `users/${userId}/bets`);
+            // Creates a new reference for this bet under the user's bets and pushes the betDetails
+            const newBetRef = push(betsRef);
+            await set(newBetRef, betDetails);
+            console.log("Bet details stored successfully.");
+        } catch (error) {
+            console.error("Failed to store bet details:", error);
+            throw new Error("Failed to store bet details");
+        }
+    } else {
+        console.log("No user signed in to store bet details.");
+    }
+}
+document.getElementById('add-credits-button').addEventListener('click', function(event) {
+    event.preventDefault(); // Prevent the default form submission behavior
+
+    // Get the current date
+    const currentDate = new Date().toDateString();
+
+    // Check if the button has been clicked today
+    const lastClickedDate = localStorage.getItem('lastClickedDate');
+    if (lastClickedDate === currentDate) {
+        // If the button has been clicked today, alert the user
+        alert('You can only add credits once per day.');
+        return;
+    }
+
+    // If the button hasn't been clicked today, add credits
+    // Update the user's balance
+    const userBalanceElement = document.getElementById('user-balance');
+    let currentBalance = parseInt(userBalanceElement.textContent);
+    currentBalance += 100; // Add 100 credits
+    userBalanceElement.textContent = currentBalance;
+
+    // Store the current date in local storage
+    localStorage.setItem('lastClickedDate', currentDate);
+
+    // Update the balance in the database (assuming you have a function for this)
+    updateUserBalance(currentBalance)
+        .then(() => {
+            // If the balance is updated successfully, notify the user
+            alert('Credits added successfully!');
+        })
+        .catch((error) => {
+            console.error('Failed to update balance:', error);
+            alert('Failed to add credits. Please try again later.');
+        });
+});
+
+async function addCreditsToUser(creditsToAdd) {
+    try {
+        const user = auth.currentUser;
+        if (user) {
+            const userId = user.uid;
+            const userRef = ref(database, 'users/' + userId);
+            const snapshot = await get(userRef);
+            if (snapshot.exists() && snapshot.val().balance !== undefined) {
+                const currentBalance = snapshot.val().balance;
+                const newBalance = currentBalance + creditsToAdd;
+                await set(ref(database, `users/${userId}/balance`), newBalance);
+                console.log("Credits added successfully.");
+                fetchAndUpdateBalance(); // Update the displayed balance
+            } else {
+                console.error("Balance not found.");
+            }
+        } else {
+            console.log("No user signed in.");
+        }
+    } catch (error) {
+        console.error("Failed to add credits:", error);
+    }
+}
+
+export { auth, database, ref, set, get, push, storeBetDetails, getCurrentUserBalance, updateUserBalance,showModal, closeModal, registerNewUser};

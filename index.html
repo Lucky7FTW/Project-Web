@@ -52,7 +52,7 @@
         <a href="javascript:void(0);" class="bn3">Home</a>
         <a href="javascript:void(0);" class="bn3 live-games-link" data-target="live-games-section">Live Games</a>
         <a href="javascript:void(0);" class="bn3 upcoming-games-link" data-target="upcoming-games-section">Upcoming Games</a>
-        <a href="javascript:void(0);" class="bn3" data-target="my-bets-section">My Bets</a>
+        <a href="javascript:void(0);" class="bn3" data-target="my-bets-section" id="my-bets-tab">My Bets</a>
         <a href="javascript:void(0);" id="flashscore-link" class="bn3" data-target="freshscore-section">Freshscore</a>
         <div class="right-buttons">
         <a href="javascript:void(0);" id="login-link" class="bn3">Login</a>
@@ -131,53 +131,36 @@
 
 
     <!-- Profile Section -->
-<div id="profile-section" class="profile-content" style="display:none;">
-    <div class="profile-container">
-        <h2>My Profile</h2>
-        <form id="profile-form">
-            <span id="close-profile" style="cursor:pointer;position:absolute;top:0;right:10px;font-size:24px;">X</span>
-            <div class="form-group">
-                <label for="profile-email">Email:</label>
-                <input type="email" id="profile-email" name="email" required readonly>
-            </div>
-            <div class="form-group">
-                <label for="profile-username">Username:</label>
-                <input type="text" id="profile-username" name="username" required readonly>
-            </div>
-            <div id="balance-display" style="margin-top: 20px;">
-                <strong>Balance:</strong> <span id="user-balance">0</span> credits
-                <button id="refresh-balance" style="margin-left: 10px; cursor: pointer;">Refresh</button>
-            </div>
-            <button id="logout-button" style="padding:10px; margin-top:10px;">Logout</button>
-        </form>
+    <div id="profile-section" class="profile-content" style="display:none;">
+        <div class="profile-container">
+            <h2>My Profile</h2>
+            <form id="profile-form">
+                <span id="close-profile" style="cursor:pointer;position:absolute;top:0;right:10px;font-size:24px;">X</span>
+                <div class="form-group">
+                    <label for="profile-email">Email:</label>
+                    <input type="email" id="profile-email" name="email" required readonly>
+                </div>
+                <div class="form-group">
+                    <label for="profile-username">Username:</label>
+                    <input type="text" id="profile-username" name="username" required readonly>
+                </div>
+                <div id="balance-display" style="margin-top: 20px;">
+                    <strong>Balance:</strong> <span id="user-balance">0</span> credits
+                    <button id="refresh-balance" style="margin-left: 10px; cursor: pointer;">Refresh</button>
+                    <!-- Add Credits Button -->
+                    <button id="add-credits-button" style="margin-left: 10px; cursor: pointer;">Add Credits</button>
+                </div>
+                <button id="logout-button" style="padding:10px; margin-top:10px;">Logout</button>
+            </form>
+        </div>
     </div>
-</div>
 
 
-    <script src="scripts/odds.js"></script>
+    <script type="module" src="scripts/odds.js"></script>
     <script src="scripts/games.js"></script>
     <script type="module" src="https://widgets.api-sports.io/football/1.1.8/widget.js"></script>
+    <script type="module" src="scripts/bets.js"></script>
 
-
-    <script type="module">
-        import { registerNewUser } from './scripts/firebase.js'; // Make sure the path is correct
-      
-        document.getElementById('signup-form').addEventListener('submit', function(event) {
-          event.preventDefault();
-          const email = document.getElementById('signup-email').value;
-          const password = document.getElementById('signup-password').value;
-      
-          registerNewUser(email, password)
-            .then(user => {
-              console.log("Signup successful, user info:", user);
-              // Handle successful signup, like redirecting or updating UI
-            })
-            .catch(error => {
-              console.error("Signup failed:", error.message);
-              // Handle errors, like showing a message to the user
-            });
-        });
-    </script>
 
     <script>
     document.getElementById('signin-link').addEventListener('click', function() {
