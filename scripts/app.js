@@ -3,7 +3,17 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelector('.upcoming-games-link').addEventListener('click', function() {
         document.getElementById('filters-container').style.display = 'block';
         const today = new Date().toISOString().split('T')[0];
-        document.getElementById('game-date-picker').value = today; // Pre-fill date picker with today's date
+        document.getElementById('game-date-picker').value = today; // Set the date picker to today
+        // You can also call fetchFilteredGames here if you want to immediately show today's games
+        // fetchFilteredGames(today, ''); // This line is optional and depends on your UX design
+        document.getElementById('flashscore-link').addEventListener('click', function() {
+            var widgetContainer = document.getElementById('flashscore-widget-container');
+            if (widgetContainer.style.display === 'none') {
+                widgetContainer.style.display = 'block';
+            } else {
+                widgetContainer.style.display = 'none';
+            }
+        });
     });
 
     // Event listener for the "Apply Filters" button

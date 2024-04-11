@@ -72,9 +72,22 @@
         <a href="javascript:void(0);" class="bn3 live-bets-link">Live Bets</a>
         <a href="javascript:void(0);" class="bn3 upcoming-games-link">Upcoming Games</a>
         <a href="/my-bets" class="bn3">My Bets</a>
-        <a href="/Flashscore" class="bn3">Flashscore</a>
+        <a href="javascript:void(0);" id="flashscore-link" class="bn3">Frashscore</a>
+
     </div>
-    
+
+    <div id="flashscore-widget-container" style="display: none;">
+        <div id="wg-api-football-fixtures"
+             data-host="v3.football.api-sports.io"
+             data-refresh="60"
+             data-date="2024-04-10"
+             data-key="ed4be25206a6d2113559eb2049ffbfad" 
+             data-theme=""
+             data-show-errors="false"
+             class="api_football_loader">
+        </div>
+    </div>
+
     <div id="filters-container" style="text-align: center; padding: 20px; display: none;">
         <input type="date" id="game-date-picker" placeholder="Select date">
         <button id="apply-filters">Apply Filters</button>
@@ -87,8 +100,36 @@
     <div id="live-games" class="live-games-container">
         <!-- Live odds will be displayed here -->
     </div>
+    <script type="module" src="https://widgets.api-sports.io/football/1.1.8/widget.js"></script>
 
     <script src="scripts/app.js"></script>
     <div class="color-strip"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('flashscore-link').addEventListener('click', function() {
+                var widgetContainer = document.getElementById('flashscore-widget-container');
+                var isVisible = widgetContainer.style.display === 'block';
+                
+                // Toggle visibility
+                widgetContainer.style.display = isVisible ? 'none' : 'block';
+        
+                // Toggle background and text colors
+                if (!isVisible) {
+                    document.documentElement.style.setProperty('--background-color', '#00141e');
+                    document.documentElement.style.setProperty('--background-color-header', '#0f2d37');
+                    document.documentElement.style.setProperty('--color-text', '#fff');
+                    document.documentElement.style.setProperty('--color-text-header', '#ffcd00');
+                } else {
+                    // Reset to original or other desired colors when hiding the widget
+                    document.documentElement.style.setProperty('--background-color', '[Your-Original-Background-Color]');
+                    document.documentElement.style.setProperty('--background-color-header', '[Your-Original-Header-Background-Color]');
+                    document.documentElement.style.setProperty('--color-text', '[Your-Original-Text-Color]');
+                    document.documentElement.style.setProperty('--color-text-header', '[Your-Original-HeaderText-Color]');
+                }
+            });
+        });
+        </script>
+        
 </body>
 </html>
