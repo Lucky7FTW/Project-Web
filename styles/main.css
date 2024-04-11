@@ -313,3 +313,16 @@ button#apply-filters:focus {
 .save-btn:hover {
     background-color: #45a049; /* Darker green on hover */
 }
+
+#logout-button {
+    padding: 10px;
+    margin-top: 10px;
+    background-color: #f44336; /* Red */
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#logout-button:hover {
+    background-color: #d32f2f; /* Darker red */
+}

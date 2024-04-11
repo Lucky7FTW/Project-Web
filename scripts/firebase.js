@@ -198,10 +198,12 @@ onAuthStateChanged(auth, (user) => {
                 console.log("User data fetched:", userData);
                 const dbEmail = userData.email || email; // Fallback to auth email if not in db
                 const username = userData.username; // Username from the database
+                const balance = userData.balance; // Assuming 'balance' is stored in your database
 
                 // Populate the form fields with data from the database
                 document.getElementById('profile-email').value = dbEmail;
                 document.getElementById('profile-username').value = username;
+                document.getElementById('user-balance').textContent = balance;
             } else {
                 // No data found in the database for this user
                 console.log("No user data available in the database.");
@@ -234,5 +236,33 @@ document.getElementById('logout-button').addEventListener('click', function() {
     });
 });
 
+function fetchAndUpdateBalance() {
+    const user = auth.currentUser; // Get the currently signed-in user
+    if (user) {
+        const userId = user.uid;
+        const userRef = ref(database, 'users/' + userId);
+        
+        get(userRef).then((snapshot) => {
+            if (snapshot.exists()) {
+                const userData = snapshot.val();
+                const balance = userData.balance; // Assuming 'balance' is stored in your database
+                
+                // Display the balance
+                document.getElementById('user-balance').textContent = balance;
+            } else {
+                console.log("No user data available in the database.");
+            }
+        }).catch((error) => {
+            console.error("Failed to fetch user data from the database:", error);
+        });
+    } else {
+        console.log("No user is signed in.");
+    }
+}
+
+document.getElementById('refresh-balance').addEventListener('click', function(event) {
+    event.preventDefault(); // Prevent the default button action
+    fetchAndUpdateBalance(); // Call the function to update the balance
+});
 
 export { showModal, closeModal, registerNewUser };
