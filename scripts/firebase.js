@@ -209,6 +209,9 @@ onAuthStateChanged(auth, (user) => {
                 document.getElementById('profile-email').value = dbEmail;
                 document.getElementById('profile-username').value = username;
                 document.getElementById('user-balance').textContent = balance;
+
+                // Check for unclaimed bets and add winnings to balance
+                checkAndAddWinnings(userId);
             } else {
                 // No data found in the database for this user
                 console.log("No user data available in the database.");
@@ -367,28 +370,82 @@ document.getElementById('add-credits-button').addEventListener('click', function
         });
 });
 
-async function addCreditsToUser(creditsToAdd) {
-    try {
-        const user = auth.currentUser;
-        if (user) {
-            const userId = user.uid;
-            const userRef = ref(database, 'users/' + userId);
-            const snapshot = await get(userRef);
-            if (snapshot.exists() && snapshot.val().balance !== undefined) {
-                const currentBalance = snapshot.val().balance;
-                const newBalance = currentBalance + creditsToAdd;
-                await set(ref(database, `users/${userId}/balance`), newBalance);
-                console.log("Credits added successfully.");
-                fetchAndUpdateBalance(); // Update the displayed balance
-            } else {
-                console.error("Balance not found.");
-            }
-        } else {
-            console.log("No user signed in.");
+
+async function fetchGameResult(fixtureId) {
+    const url = `https://api-football-v1.p.rapidapi.com/v3/fixtures?id=${fixtureId}`;
+    const options = {
+        method: 'GET',
+        headers: {
+            'X-RapidAPI-Key': 'f33387c838msh57d5f5abaefe508p1a5bf4jsnefd641827203', // Replace with your API key
+            'X-RapidAPI-Host': 'api-football-v1.p.rapidapi.com'
         }
-    } catch (error) {
-        console.error("Failed to add credits:", error);
+    };
+
+    const response = await fetch(url, options);
+    const data = await response.json();
+    const gameDetails = data.response[0]; // Assuming each call returns a single fixture
+    return {
+        status: gameDetails.fixture.status.short, // Example status codes: FT (Full Time), NS (Not Started)
+        details: gameDetails
+    };
+}
+
+// Function to check and update winnings for unclaimed bets
+async function checkAndAddWinnings(userId) {
+    const betsRef = ref(database, `users/${userId}/bets`);
+    const betsSnapshot = await get(betsRef);
+    if (betsSnapshot.exists()) {
+        const bets = betsSnapshot.val();
+        let totalWinnings = 0;
+
+        for (const betKey in bets) {
+            const bet = bets[betKey];
+            if (!bet.claimed) { // Only process unclaimed bets
+                const gameInfo = await fetchGameResult(bet.fixtureId);
+
+                // Process the bet only if the game has finished
+                if (gameInfo.status === 'FT') {  // 'FT' stands for Full Time, indicating the game is over
+                    const result = determineBetResult(gameInfo.details, bet.label);
+
+                    if (result === 'Won') {
+                        const winnings = bet.amount * parseFloat(bet.odds);
+                        totalWinnings += winnings;
+                    }
+
+                    // Mark the bet as claimed, regardless of the outcome
+                    const betUpdateRef = ref(database, `users/${userId}/bets/${betKey}`);
+                    await set(betUpdateRef, {...bet, claimed: true, result: result});  // Now includes the result
+                }
+            }
+        }
+
+        // Update the balance only if there are winnings
+        if (totalWinnings > 0) {
+            // Fetch current balance
+            const userRef = ref(database, `users/${userId}`);
+            const userSnapshot = await get(userRef);
+            if (userSnapshot.exists()) {
+                const userData = userSnapshot.val();
+                const newBalance = (userData.balance || 0) + totalWinnings;
+                // Update the balance
+                await set(ref(database, `users/${userId}/balance`), newBalance);
+            }
+        }
     }
 }
 
+// Function to determine if the bet won based on game results and the bet label
+function determineBetResult(gameDetails, betLabel) {
+    const homeScore = gameDetails.goals.home;
+    const awayScore = gameDetails.goals.away;
+    if (homeScore > awayScore && betLabel === "Home Win Odds") {
+        return 'Won';
+    } else if (awayScore > homeScore && betLabel === "Away Win Odds") {
+        return 'Won';
+    } else if (homeScore === awayScore && betLabel === "Draw Odds") {
+        return 'Won';
+    } else {
+        return 'Lost';
+    }
+}
 export { auth, database, ref, set, get, push, storeBetDetails, getCurrentUserBalance, updateUserBalance,showModal, closeModal, registerNewUser};
