@@ -208,7 +208,7 @@ onAuthStateChanged(auth, (user) => {
                 // Populate the form fields with data from the database
                 document.getElementById('profile-email').value = dbEmail;
                 document.getElementById('profile-username').value = username;
-                document.getElementById('user-balance').textContent = balance;
+                document.getElementById('user-balance').textContent = parseFloat(balance).toFixed(2);
 
                 // Check for unclaimed bets and add winnings to balance
                 checkAndAddWinnings(userId);
@@ -256,7 +256,7 @@ function fetchAndUpdateBalance() {
                 const balance = userData.balance; // Assuming 'balance' is stored in your database
                 
                 // Display the balance
-                document.getElementById('user-balance').textContent = balance;
+                document.getElementById('user-balance').textContent = parseFloat(balance).toFixed(2);;
             } else {
                 console.log("No user data available in the database.");
             }
