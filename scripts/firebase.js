@@ -334,40 +334,46 @@ async function storeBetDetails(betDetails) {
         console.log("No user signed in to store bet details.");
     }
 }
-document.getElementById('add-credits-button').addEventListener('click', function(event) {
+document.getElementById('add-credits-button').addEventListener('click', async function(event) {
     event.preventDefault(); // Prevent the default form submission behavior
 
-    // Get the current date
-    const currentDate = new Date().toDateString();
-
-    // Check if the button has been clicked today
-    const lastClickedDate = localStorage.getItem('lastClickedDate');
-    if (lastClickedDate === currentDate) {
-        // If the button has been clicked today, alert the user
-        alert('You can only add credits once per day.');
+    const user = auth.currentUser;
+    if (!user) {
+        alert('Please log in to add credits.');
         return;
     }
 
-    // If the button hasn't been clicked today, add credits
-    // Update the user's balance
-    const userBalanceElement = document.getElementById('user-balance');
-    let currentBalance = parseInt(userBalanceElement.textContent);
-    currentBalance += 100; // Add 100 credits
-    userBalanceElement.textContent = currentBalance;
+    // Reference to user's metadata in Firebase
+    const userRef = ref(database, `users/${user.uid}/lastClickedDate`);
 
-    // Store the current date in local storage
-    localStorage.setItem('lastClickedDate', currentDate);
+    try {
+        // Get the current date
+        const currentDate = new Date().toDateString();
 
-    // Update the balance in the database (assuming you have a function for this)
-    updateUserBalance(currentBalance)
-        .then(() => {
-            // If the balance is updated successfully, notify the user
-            alert('Credits added successfully!');
-        })
-        .catch((error) => {
-            console.error('Failed to update balance:', error);
-            alert('Failed to add credits. Please try again later.');
-        });
+        // Check the last clicked date from Firebase
+        const snapshot = await get(userRef);
+        if (snapshot.exists() && snapshot.val() === currentDate) {
+            alert('You can only add credits once per day.');
+            return;
+        }
+
+        // If the button hasn't been clicked today, add credits
+        // Fetch and update the user's balance
+        let currentBalance = await getCurrentUserBalance(); // Assume this function fetches balance from Firebase
+        currentBalance += 100; // Add 100 credits
+
+        // Update the balance in Firebase
+        await updateUserBalance(currentBalance); // Assume this function updates balance in Firebase
+
+        // Store the current date in Firebase
+        await set(userRef, currentDate);
+
+        // Notify the user
+        alert('Credits added successfully!');
+    } catch (error) {
+        console.error('Failed to add credits:', error);
+        alert('Failed to add credits. Please try again later.');
+    }
 });
 
 
