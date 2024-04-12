@@ -32,12 +32,22 @@ async function loadUserBets() {
                     return;
                 }
                 betsContainer.innerHTML = ''; // Clear previous content
-                for (const bet of Object.values(bets)) {
+                for (const betKey of Object.keys(bets)) {
                     try {
+                        const bet = bets[betKey];
                         const gameDetails = await fetchGameDetails(bet.fixtureId);
-                        displayBet(gameDetails, bet);
+                        const gameStatus = getGameStatus(gameDetails);
+                        if (gameStatus === 'Finished') {
+                            const betOutcome = getBetOutcome(gameDetails, bet.label);
+                            
+                            displayBet(gameDetails, bet);
+                        } else {
+                            console.log("Game not finished yet. Bet outcome will be determined after the game finishes.");
+                            // Display bet without determining outcome
+                            displayBet(gameDetails, bet);
+                        }
                     } catch (error) {
-                        console.error('Error fetching game details:', error);
+                        console.error('Error processing bet:', error);
                     }
                 }
             } else {
@@ -51,7 +61,6 @@ async function loadUserBets() {
         console.log("No user signed in.");
     }
 }
-
 
 async function fetchGameDetails(fixtureId) {
     const url = `https://api-football-v1.p.rapidapi.com/v3/fixtures?id=${fixtureId}`;
@@ -69,11 +78,22 @@ async function fetchGameDetails(fixtureId) {
     return data.response[0]; // Assuming each call returns a single fixture
 }
 
-function displayBet(gameDetails, bet) {
+async function displayBet(gameDetails, bet) {
     const betsContainer = document.getElementById('my-bets-section');
     if (!betsContainer) {
         console.error('Bets container not found in the DOM.');
         return;
+    }
+
+    const homeScore = gameDetails.goals.home;
+    const awayScore = gameDetails.goals.away;
+    const matchWinner = determineWinner(homeScore, awayScore);
+
+    const gameStatus = getGameStatus(gameDetails);
+    let betOutcome = 'N/A'; // Default value for bet outcome
+
+    if (gameStatus === 'Finished') {
+        betOutcome = getBetOutcome(matchWinner, bet.label);
     }
 
     const betElement = document.createElement('div');
@@ -88,6 +108,8 @@ function displayBet(gameDetails, bet) {
             <div><strong>Amount:</strong> $${bet.amount}</div>
             <div><strong>Odds:</strong> ${bet.odds}</div>
             <div><strong>Date:</strong> ${new Date(bet.placedOn).toLocaleString()}</div>
+            <div><strong>Outcome:</strong> ${betOutcome}</div>
+            <div><strong>Status:</strong> ${gameStatus}</div>
         </div>
         <div class="team away-team">
             <img src="${gameDetails.teams.away.logo}" alt="${gameDetails.teams.away.name}" class="team-logo">
@@ -95,4 +117,34 @@ function displayBet(gameDetails, bet) {
         </div>
     `;
     betsContainer.appendChild(betElement);
+}
+
+function determineWinner(homeScore, awayScore) {
+    if (homeScore > awayScore) {
+        return 'home';
+    } else if (awayScore > homeScore) {
+        return 'away';
+    } else {
+        return 'draw';
+    }
+}
+
+function getBetOutcome(matchWinner, betLabel) {
+    if (matchWinner === 'home' && betLabel === 'Home Win Odds') {
+        return 'Won';
+    } else if (matchWinner === 'away' && betLabel === 'Away Win Odds') {
+        return 'Won';
+    } else if (matchWinner === 'draw' && betLabel === 'Draw Odds') {
+        return 'Won';
+    } else {
+        return 'Lost';
+    }
+}
+
+function getGameStatus(gameDetails) {
+    if (gameDetails.fixture.status.short === 'FT') {
+        return 'Finished';
+    } else {
+        return 'Not Finished';
+    }
 }

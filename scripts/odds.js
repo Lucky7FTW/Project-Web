@@ -185,7 +185,8 @@ function displayOdds(data,fixtureId) {
                         fixtureId: fixtureId,
                         label: label, // Assuming 'label' is defined in your scope
                         odds: odds, // Assuming 'odds' is defined in your scope
-                        placedOn: new Date().toISOString()
+                        placedOn: new Date().toISOString(),
+                        claimed: false  // Adding the 'claimed' state with a default value of false
                     };
                     await storeBetDetails(betDetails); // Assuming this function is implemented in your firebase.js
             
